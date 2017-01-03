@@ -10,8 +10,8 @@ import UIKit
 
 class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
-    @IBOutlet weak var pickedImage: UIImageView!
-    
+    var videoURL: NSURL?
+    let imagePicker = UIImagePickerController()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,21 +24,20 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     }
 
     @IBAction func photoLibraryAction(_ sender: UIButton) {
-        if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.photoLibrary){
-            let imagePicker = UIImagePickerController()
-            imagePicker.delegate = self
-            imagePicker.sourceType = UIImagePickerControllerSourceType.photoLibrary;
-            imagePicker.allowsEditing = false
-            self.present(imagePicker, animated: true, completion: nil)
-        }
+        imagePicker.delegate = self
+        imagePicker.sourceType = .photoLibrary
+        imagePicker.mediaTypes = ["public.movie"]
+        
+        self.present(imagePicker, animated: true, completion: nil)
+        
     }
     
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingImage image: UIImage!, editingInfo: [NSObject : AnyObject]!){
-        pickedImage.image = image
-        self.dismiss(animated: true, completion: nil);
+    func imagePickerController(_picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]){
+        videoURL = info["UIImagePickerControllerReferenceURL"] as? NSURL
+        print(videoURL)
+        imagePicker.dismiss(animated: true, completion: nil)
     }
     
     
-
 }
 
