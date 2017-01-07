@@ -7,15 +7,32 @@
 //
 
 import UIKit
+import AVKit
+import AVFoundation
 
 class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
-    var videoURL: NSURL?
+    var videoURL: URL?
     let imagePicker = UIImagePickerController()
+    
+    var avPlayerLayer: AVPlayerLayer!
+    let avPlayer = AVPlayer()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        view.backgroundColor = .black
+        
+        avPlayerLayer = AVPlayerLayer(player: avPlayer)
+        view.layer.insertSublayer(avPlayerLayer, at: 0)
+        
+        if videoURL != nil {
+            
+            let playerItem = AVPlayerItem(url: videoURL!)
+            avPlayer.replaceCurrentItem(with: playerItem)
+            
+            
+            print("player set up")
+        }
     }
 
     override func didReceiveMemoryWarning() {
@@ -28,14 +45,41 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
         imagePicker.sourceType = .photoLibrary
         imagePicker.mediaTypes = ["public.movie"]
         
+        print("OPENING picker")
+
         self.present(imagePicker, animated: true, completion: nil)
         
     }
     
-    func imagePickerController(_picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]){
-        videoURL = info["UIImagePickerControllerReferenceURL"] as? NSURL
-        print(videoURL)
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        print("Starting Playback")
+        avPlayer.play() // Start the playback
+    }
+    
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        
+        // Layout subviews manually
+        avPlayerLayer.frame = view.bounds
+    }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        // Dismiss the picker if the user canceled.
+        dismiss(animated: true, completion: nil)
+    }
+    
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]){
+        videoURL = info[UIImagePickerControllerMediaURL] as? URL
+        print(videoURL!)
+        
+        print("CLOSING Picker")
+        
         imagePicker.dismiss(animated: true, completion: nil)
+        
+        viewDidLoad()
+       
     }
     
     
